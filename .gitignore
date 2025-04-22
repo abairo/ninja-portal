@@ -172,3 +172,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Temporary files
+# TODO Improve this
+patterns.py
