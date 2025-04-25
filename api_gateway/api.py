@@ -44,7 +44,6 @@ async def proxy_request(request, path: str):
             return JsonResponse({"error": "Missing or invalid token"}, status=401)
         access_token = extract_token(auth)
         introspected_data = await introspect(access_token)
-        breakpoint();
         if not introspected_data.get("active"):
             return JsonResponse({"detail": "Invalid token"}, status=401)
 
