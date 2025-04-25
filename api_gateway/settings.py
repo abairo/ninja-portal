@@ -128,3 +128,7 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# URI patterns
+# Will be loaded when the 'apps.gateway' is ready
+URI_PATTERNS = None

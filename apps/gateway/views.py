@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from ninja import Router
 
 load_dotenv()
-from .patterns import URL_PATTERNS
+from django.conf import settings
 from .services import introspect
 from .utils import extract_token, match_route
 
@@ -21,12 +21,13 @@ APP_TOKEN = os.getenv("APP_TOKEN")
 @router.api_operation(["GET", "POST", "PUT", "DELETE", "PATCH"], "/proxy/{path:path}")
 async def proxy_request(request, path: str):
     method = request.method.upper()
-    route = match_route(path, method, URL_PATTERNS)
+    route = match_route(f"/{path}", method, settings.URI_PATTERNS)
+
     if not route:
         return JsonResponse(
             {"error": "Path or method not allowed"}, status=403
         )
-    if route["requires_auth"]:
+    if route.requires_auth:
         auth = request.headers.get("Authorization")
         if not auth or not auth.startswith("Bearer "):
             return JsonResponse(
@@ -37,7 +38,7 @@ async def proxy_request(request, path: str):
         if not introspected_data.get("active"):
             return JsonResponse({"detail": "Invalid token"}, status=401)
 
-    target_path = route["target_path"] or path
+    target_path = route.target_path or path
     backend_url = f"{BACKEND_BASE_URL}{target_path}"
 
     headers = {

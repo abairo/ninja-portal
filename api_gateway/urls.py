@@ -18,7 +18,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from ninja import NinjaAPI
-# from .api import router as proxy_router
 from apps.gateway.views import router as proxy_router
 
 api = NinjaAPI()
@@ -28,5 +27,3 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", api.urls),
 ]
-
-# urlpatterns = [path("admin/", admin.site.urls), path("api/", router.urls)]
