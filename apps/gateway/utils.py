@@ -1,4 +1,5 @@
 from apps.gateway.data_types import URIPatternData
+from urllib.parse import urlparse
 
 
 def extract_token(authorization: str):
@@ -6,7 +7,8 @@ def extract_token(authorization: str):
 
 
 def match_route(path: str, method: str, routes: tuple[URIPatternData]) -> URIPatternData | None:
+    parsed = urlparse(path)
     for route in routes:
-        if route.pattern.parse(path) and method.upper() in route.methods:
+        if route.pattern.parse(parsed.path) and method.upper() in route.methods:
             return route
     return None
