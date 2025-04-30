@@ -20,4 +20,5 @@ application = get_asgi_application()
 from django.conf import settings
 from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 
+
 application = ASGIStaticFilesHandler(application)
