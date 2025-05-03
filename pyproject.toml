@@ -19,11 +19,14 @@ dependencies = [
 [tool.poetry]
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.5"
+pytest-django = "^4.11.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+
 [tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "api_gateway.settings"
+python_files = ["test_*.py", "*_test.py", "testing/python/*.py"]
 testpaths = ["apps/gateway/tests*"]
