@@ -14,9 +14,8 @@ import os
 
 from pathlib import Path
 
-from dotenv import load_dotenv
+from decouple import config
 
-load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-aoy3%e4gsg&a%d_fn3p4)jp!bwo0dbw1@^@)_8+!ps6yyx)t35"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
 # Application definition
@@ -109,9 +108,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = config("LANGUAGE_CODE", default="en-us")
 
-TIME_ZONE = "UTC"
+TIME_ZONE = config("TIME_ZONE", default="UTC")
 
 USE_I18N = True
 
@@ -132,3 +131,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # URI patterns
 # Will be loaded when the 'apps.gateway' is ready
 URI_PATTERNS = None
+
+# Gateway Config
+BACKEND_BASE_URL = config("BACKEND_BASE_URL")
+INTROSPECT_URL = config("KEYCLOAK_INTROSPECT_URL")
+CLIENT_ID = config("KEYCLOAK_CLIENT_ID")
+CLIENT_SECRET = config("KEYCLOAK_CLIENT_SECRET")
+BACKEND_BASE_URL = config("BACKEND_BASE_URL")
+APP_TOKEN = config("APP_TOKEN")

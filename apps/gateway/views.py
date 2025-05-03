@@ -1,21 +1,11 @@
-import os
 from aiohttp import ClientSession
 from django.http import HttpResponse, JsonResponse
-from dotenv import load_dotenv
 from ninja import Router
-
-load_dotenv()
 from django.conf import settings
 from .services import introspect
 from .utils import extract_token, match_route
 
 router = Router()
-
-INTROSPECT_URL = os.getenv("KEYCLOAK_INTROSPECT_URL") or ""
-CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
-CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
-BACKEND_BASE_URL = os.getenv("BACKEND_BASE_URL")
-APP_TOKEN = os.getenv("APP_TOKEN")
 
 
 @router.api_operation(["GET", "POST", "PUT", "DELETE", "PATCH"], "/proxy/{path:path}")
@@ -39,20 +29,20 @@ async def proxy_request(request, path: str):
             return JsonResponse({"detail": "Invalid token"}, status=401)
 
     target_path = route.target_path or path
-    backend_url = f"{BACKEND_BASE_URL}{target_path}"
+    backend_url = f"{settings.BACKEND_BASE_URL}{target_path}"
 
     headers = {
         k: v for k, v in request.headers.items()
         if k.lower() not in {"host", "content-length", "connection"}
     }
 
-    headers['Authorization'] = f"Token {APP_TOKEN}"
+    headers['Authorization'] = f"Token {settings.APP_TOKEN}"
 
     data = None
 
     if method in ("POST", "PUT", "PATCH"):
         data = request.body
-        
+
     async with ClientSession() as session:
         async with session.request(
             method=method,
