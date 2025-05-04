@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.conf import settings
 from apps.gateway.models import URIPattern
-from .update_patterns import update_patterns
+from .services import get_uri_patterns
 
 
 class URIPatternAdmin(admin.ModelAdmin):
@@ -11,7 +11,7 @@ class URIPatternAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        settings.URI_PATTERNS = update_patterns()
+        settings.URI_PATTERNS = get_uri_patterns()
 
 
 admin.site.register(URIPattern, URIPatternAdmin)

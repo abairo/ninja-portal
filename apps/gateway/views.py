@@ -5,7 +5,8 @@ from django.conf import settings
 from .services import (
     introspect,
     match_route,
-    get_backend_url
+    get_backend_url,
+    get_uri_patterns
 )
 from .token_utils import extract_token
 
@@ -15,7 +16,7 @@ router = Router()
 @router.api_operation(["GET", "POST", "PUT", "DELETE", "PATCH"], "/proxy/{path:path}")
 async def proxy_request(request, path: str):
     method = request.method.upper()
-    route = match_route(f"/{path}", method, settings.URI_PATTERNS)
+    route = match_route(f"/{path}", method, get_uri_patterns())
 
     if not route:
         return JsonResponse(
