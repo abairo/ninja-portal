@@ -1,24 +1,29 @@
-import os
-from dotenv import load_dotenv
+from django.conf import settings
 from aiohttp import ClientSession
-
-load_dotenv()
-
-INTROSPECT_URL = os.getenv("KEYCLOAK_INTROSPECT_URL") or ""
-CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
-CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
-BACKEND_BASE_URL = os.getenv("BACKEND_BASE_URL")
-APP_TOKEN = os.getenv("APP_TOKEN")
+from apps.gateway.data_types import URIPatternData
+from urllib.parse import urlparse
 
 
 async def introspect(access_token: str) -> dict:
     async with ClientSession() as session:
         async with session.post(
-            INTROSPECT_URL,
+            settings.INTROSPECT_URL,
             data={
                 "token": access_token,
-                "client_id": CLIENT_ID,
-                "client_secret": CLIENT_SECRET,
+                "client_id": settings.CLIENT_ID,
+                "client_secret": settings.CLIENT_SECRET,
             },
         ) as response:
             return await response.json()
+
+
+def match_route(path: str, method: str, routes: tuple[URIPatternData]) -> URIPatternData | None:
+    parsed = urlparse(path)
+    for route in routes:
+        if route.pattern.parse(parsed.path) and method.upper() in route.methods:
+            return route
+    return None
+
+
+def get_backend_url(path: str, route: URIPatternData) -> str:
+    return route.target_path or f"{settings.BACKEND_BASE_URL}{path}"

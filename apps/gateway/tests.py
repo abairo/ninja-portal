@@ -1,4 +1,4 @@
-from .utils import get_backend_url
+from .services import get_backend_url
 from .data_types import URIPatternData
 from django.conf import settings
 

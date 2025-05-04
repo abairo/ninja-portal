@@ -2,12 +2,12 @@ from aiohttp import ClientSession
 from django.http import HttpResponse, JsonResponse
 from ninja import Router
 from django.conf import settings
-from .services import introspect
-from .utils import (
-    extract_token,
+from .services import (
+    introspect,
     match_route,
     get_backend_url
 )
+from .utils import extract_token
 
 router = Router()
 
