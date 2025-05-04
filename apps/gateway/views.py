@@ -7,7 +7,7 @@ from .services import (
     match_route,
     get_backend_url
 )
-from .utils import extract_token
+from .token_utils import extract_token
 
 router = Router()
 
