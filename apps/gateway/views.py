@@ -3,7 +3,11 @@ from django.http import HttpResponse, JsonResponse
 from ninja import Router
 from django.conf import settings
 from .services import introspect
-from .utils import extract_token, match_route
+from .utils import (
+    extract_token,
+    match_route,
+    get_backend_url
+)
 
 router = Router()
 
@@ -28,8 +32,7 @@ async def proxy_request(request, path: str):
         if not introspected_data.get("active"):
             return JsonResponse({"detail": "Invalid token"}, status=401)
 
-    target_path = route.target_path or path
-    backend_url = f"{settings.BACKEND_BASE_URL}{target_path}"
+    backend_url = get_backend_url(path, route)
 
     headers = {
         k: v for k, v in request.headers.items()
