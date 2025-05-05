@@ -86,6 +86,15 @@ DATABASES = {
 }
 
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION": "memcached:11211",
+        "TIMEOUT": None
+    }
+}
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -127,10 +136,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# URI patterns
-# Will be loaded when the 'apps.gateway' is ready
-URI_PATTERNS = None
 
 # Gateway Config
 BACKEND_BASE_URL = config("BACKEND_BASE_URL")

@@ -8,6 +8,9 @@ class URIPattern(models.Model):
     requires_auth = models.BooleanField(default=False)
     target_path = models.CharField(verbose_name="Target path", max_length=256, blank=True, default="")  # noqa: E501
 
+    class Meta:
+        unique_together = ("pattern", "methods")
+
     def to_uri_pattern_data(self) -> URIPatternData:
         methods = self.methods.replace(" ", "").split(',')
         return URIPatternData(

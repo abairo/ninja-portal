@@ -9,3 +9,12 @@ services:
       - 8009:8000
     volumes:
       - ./:/app
+    depends_on:
+      - memcached
+  memcached:
+    container_name: ninja_portal_cache
+    image: memcached:1.6.38-alpine
+    command:
+      - --conn-limit=1024
+      - --memory-limit=16
+      - --threads=4
