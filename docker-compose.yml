@@ -1,7 +1,10 @@
 services:
   gateway:
     container_name: ninja_portal
-    build: .
+    build:
+      context: .
+      args:
+        INSTALL_DEV_DEPS: ${DEBUG}
     env_file:
       - .env
     command: ["gunicorn", "api_gateway.asgi:application", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "--workers", "4"]
