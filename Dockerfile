@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.13.3-alpine
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -6,10 +6,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock ./
+RUN pip install --no-cache-dir poetry
 
-RUN pip install --no-cache-dir poetry && \
-    poetry install --no-root --only main
+COPY pyproject.toml poetry.lock ./
+RUN poetry install --no-root --only main
 
 COPY . .
 
