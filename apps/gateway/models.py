@@ -7,6 +7,7 @@ class URIPattern(models.Model):
     methods = models.CharField(verbose_name="Allowed methods separated with comma ','", max_length=100)  # noqa: E501
     requires_auth = models.BooleanField(default=False)
     target_path = models.CharField(verbose_name="Target path", max_length=256, blank=True, default="")  # noqa: E501
+    is_active = models.BooleanField(verbose_name="Active", default=False)
 
     class Meta:
         unique_together = ("pattern", "methods")
