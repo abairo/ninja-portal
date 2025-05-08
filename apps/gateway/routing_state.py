@@ -10,8 +10,9 @@ _route_cache: tuple[URIPatternData] | None = None
 
 @sync_to_async
 def load_uri_patterns() -> tuple[URIPatternData]:
+    uri_patterns = URIPattern.objects.filter(is_active=True)
     return tuple(
-        map(lambda uri: uri.to_uri_pattern_data(), URIPattern.objects.all())
+        map(lambda uri: uri.to_uri_pattern_data(), uri_patterns)
     )
 
 
