@@ -5,6 +5,15 @@ from urllib.parse import urlparse
 
 
 async def introspect(access_token: str) -> dict:
+    """
+    Validates a Bearer token by introspecting it against the configured authentication provider.
+
+    Args:
+        access_token (str): The Bearer token to validate.
+
+    Returns:
+        dict: The introspection response containing token status and metadata.
+    """
     async with ClientSession() as session:
         async with session.post(
             settings.INTROSPECT_URL,
@@ -18,6 +27,17 @@ async def introspect(access_token: str) -> dict:
 
 
 def match_route(path: str, method: str, routes: tuple[URIPatternData]) -> URIPatternData | None:
+    """
+    Matches a request path and method against a list of active URI patterns.
+
+    Args:
+        path (str): The incoming request path.
+        method (str): The HTTP method (e.g., 'GET').
+        routes (tuple[URIPatternData]): List of active URI patterns.
+
+    Returns:
+        URIPatternData | None: The matching route configuration or None if no match is found.
+    """
     parsed = urlparse(path)
     for route in routes:
         if route.pattern.parse(parsed.path) and method.upper() in route.methods:
@@ -26,4 +46,14 @@ def match_route(path: str, method: str, routes: tuple[URIPatternData]) -> URIPat
 
 
 def get_backend_url(path: str, route: URIPatternData) -> str:
+    """
+    Constructs the full backend URL for forwarding the request.
+
+    Args:
+        path (str): The incoming request path.
+        route (URIPatternData): The matched route configuration.
+
+    Returns:
+        str: The full target URL.
+    """
     return route.target_path or f"{settings.BACKEND_BASE_URL}{path}"
