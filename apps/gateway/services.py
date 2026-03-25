@@ -56,4 +56,5 @@ def get_backend_url(path: str, route: URIPatternData) -> str:
     Returns:
         str: The full target URL.
     """
-    return route.target_path or f"{settings.BACKEND_BASE_URL}{path}"
+    base_url = route.upstream_base_url
+    return route.target_path or f"{base_url}{path}"

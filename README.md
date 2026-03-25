@@ -60,8 +60,6 @@ cp env.example .env
 | `KEYCLOAK_INTROSPECT_URL` | OAuth2 Token Introspection URL | `http://auth-server/realms/master/protocol/openid-connect/token/introspect` |
 | `KEYCLOAK_CLIENT_ID` | Client ID for introspection | `api-gateway` |
 | `KEYCLOAK_CLIENT_SECRET` | Client Secret for introspection | `secret-value` |
-| `BACKEND_BASE_URL` | Default fallback backend URL | `http://backend-service:8000` |
-| `APP_TOKEN` | Token sent to backend services | `internal-service-token` |
 
 ### 3. Database Setup
 
@@ -98,29 +96,36 @@ docker-compose up -d --build
 
 ## 📖 Usage & Architecture
 
-### Dynamic Routing
+### Dynamic Routing & Upstreams
 
-The Gateway uses `URIPattern` models to decide how to handle requests. You can manage these via the Django Admin interface (`/admin`).
+The Gateway uses `Upstream` and `URIPattern` models to decide how to handle and route requests securely. You can manage these via the Django Admin interface (`/admin`).
 
-**Fields:**
+**Upstream Fields:**
+-   **Name**: A descriptive name for the partner service or backend.
+-   **Base URL**: The base host URL for the destination (e.g., `https://api.partner.com/v1`).
+-   **Application Token**: The token (API Key, service token) to inject in the outgoing request.
+-   **Token Prefix**: The prefix for the authorization header (e.g., `Bearer `, `ApiKey `).
+
+**URIPattern Fields:**
 -   **URI Pattern**: The path pattern to match (e.g., `/api/v1/users`).
 -   **Methods**: Comma-separated HTTP methods (e.g., `GET,POST`).
--   **Requires Auth**: Boolean. If `True`, the gateway validates the `Authorization` header against `KEYCLOAK_INTROSPECT_URL`.
--   **Target Path**: (Optional) Specific target URL. If empty, it appends the incoming path to `BACKEND_BASE_URL`.
+-   **Requires Auth**: Boolean. If `True`, the gateway validates the incoming client `Authorization` header against `KEYCLOAK_INTROSPECT_URL`.
+-   **Upstream**: ForeignKey to the destination `Upstream` model.
+-   **Target Path**: (Optional) Specific target URL or path override. If empty, the incoming path is appended to the `Upstream` Base URL.
 
 ### Request Flow
 
 1.  **Client** sends a request to `/proxy/some/path`.
 2.  **Gateway** matches the path against active `URIPatterns`.
     -   If no match found -> `403 Forbidden`.
-3.  **Authentication** (if `Requires Auth` is True):
-    -   Extracts `Bearer` token.
+3.  **Client Authentication** (if `Requires Auth` is True):
+    -   Extracts client's `Bearer` token.
     -   Calls `KEYCLOAK_INTROSPECT_URL`.
     -   If invalid/inactive -> `401 Unauthorized`.
-4.  **Forwarding**:
-    -   Requests are forwarded to the backend.
-    -   An internal `Authorization: Token <APP_TOKEN>` header is injected.
-    -   Original headers (excluding Host, Content-Length) are preserved.
+4.  **Forwarding & Upstream Auth**:
+    -   Requests are forwarded to the linked `Upstream` backend URL.
+    -   The `Upstream` mapped credentials (`Token Prefix` + `Application Token`) are injected into the `Authorization` header dynamically.
+    -   Original headers (excluding Host, Content-Length, Authorization) are preserved.
 
 ### API Documentation
 
