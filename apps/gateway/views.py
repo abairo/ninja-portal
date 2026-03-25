@@ -54,10 +54,12 @@ async def proxy_request(request, path: str):
 
     headers = {
         k: v for k, v in request.headers.items()
-        if k.lower() not in {"host", "content-length", "connection"}
+        if k.lower() not in {"host", "content-length", "connection", "authorization"}
     }
 
-    headers['Authorization'] = f"Token {settings.APP_TOKEN}"
+    if route.upstream_app_token:
+        prefix = route.upstream_token_prefix or "Bearer "
+        headers['Authorization'] = f"{prefix}{route.upstream_app_token}"
 
     data = None
 
