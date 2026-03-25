@@ -16,6 +16,22 @@ router = Router()
 
 @router.api_operation(["GET", "POST", "PUT", "DELETE", "PATCH"], "/proxy/{path:path}")
 async def proxy_request(request, path: str):
+    """
+    Proxies requests to the backend service based on matching URI patterns.
+
+    This view performs the following steps:
+    1. Matches the request path against active URI patterns.
+    2. Validates authentication if required by the pattern.
+    3. Forwards the request to the target backend URL.
+    4. Returns the backend's response to the client.
+
+    Args:
+        request: The Django/Ninja request object.
+        path (str): The path captured from the URL.
+
+    Returns:
+        HttpResponse | JsonResponse: The response from the backend or an error message.
+    """
     method = request.method.upper()
     route = match_route(f"/{path}", method, await get_uri_patterns())
 
