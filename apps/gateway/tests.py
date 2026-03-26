@@ -1,5 +1,6 @@
+from asgiref.sync import sync_to_async
 import pytest
-from .models import URIPattern
+from .models import URIPattern, Upstream
 from .data_types import URIPatternData
 from .token_utils import extract_token
 from .services import (
@@ -25,9 +26,9 @@ def test_get_backend_url_without_target_path():
     path = "api/v1/example"
     expected_url = f"http://mock-upstream.com/{path}"
     route = URIPatternData(
-        pattern=path, 
-        methods=("GET",), 
-        requires_auth=True, 
+        pattern=path,
+        methods=("GET",),
+        requires_auth=True,
         target_path='',
         upstream_base_url="http://mock-upstream.com/"
     )
@@ -60,3 +61,32 @@ def test_extract_token(test_input, expected_output):
 @pytest.mark.django_db
 def test_get_uri_patterns(uri_patterns: URIPattern):
     assert get_uri_patterns()
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db
+async def test_cache_refreshed_on_upstream_change():
+    """Should refresh cache when an upstream is updated"""
+    # Create Upstream and URIPattern
+    upstream = await sync_to_async(Upstream.objects.create)(
+        name="Test Upstream",
+        base_url="http://old-url.com"
+    )
+    await sync_to_async(URIPattern.objects.create)(
+        pattern="/test",
+        methods="GET",
+        upstream=upstream,
+        is_active=True
+    )
+
+    # Populate cache
+    patterns = await get_uri_patterns()
+    assert patterns[0].upstream_base_url == "http://old-url.com/"
+
+    # Update Upstream
+    upstream.base_url = "http://new-url.com"
+    await sync_to_async(upstream.save)()
+
+    # Verify cache is updated
+    patterns = await get_uri_patterns()
+    assert patterns[0].upstream_base_url == "http://new-url.com/"
