@@ -59,7 +59,7 @@ async def proxy_request(request, path: str):
 
     if route.upstream_app_token:
         prefix = route.upstream_token_prefix or "Bearer "
-        headers['Authorization'] = f"{prefix}{route.upstream_app_token}"
+        headers['Authorization'] = f"{prefix} {route.upstream_app_token}"
 
     data = None
 
