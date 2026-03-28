@@ -1,7 +1,10 @@
-from django.conf import settings
-from aiohttp import ClientSession
-from apps.gateway.data_types import URIPatternData
 from urllib.parse import urlparse
+
+from django.conf import settings
+
+from apps.gateway.data_types import URIPatternData
+
+from .infrastructure.http_client import create_http_session
 
 
 async def introspect(access_token: str) -> dict:
@@ -14,7 +17,7 @@ async def introspect(access_token: str) -> dict:
     Returns:
         dict: The introspection response containing token status and metadata.
     """
-    async with ClientSession() as session:
+    async with create_http_session() as session:
         async with session.post(
             settings.INTROSPECT_URL,
             data={
