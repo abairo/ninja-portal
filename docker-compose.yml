@@ -10,9 +10,6 @@ services:
     command: ["gunicorn", "api_gateway.asgi:application", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "--workers", "4"]
     ports:
       - 8009:8000
-    volumes:
-      - ./:/app
-      - /app/.venv
     depends_on:
       - memcached
   memcached:
