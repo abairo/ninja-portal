@@ -1,12 +1,12 @@
 from asgiref.sync import sync_to_async
 import pytest
-from .models import URIPattern, Upstream
+
 from .data_types import URIPatternData
-from .token_utils import extract_token
-from .services import (
-    get_backend_url
-)
+from .infrastructure.http_client import create_http_session
+from .models import URIPattern, Upstream
 from .routing_state import get_uri_patterns
+from .services import get_backend_url
+from .token_utils import extract_token
 
 ROUTES = [
     {"pattern": "/api/v1/my-example/{id}/example_1", "methods": ("GET",), "requires_auth": True, "target_path": ""},
@@ -67,7 +67,6 @@ def test_get_uri_patterns(uri_patterns: URIPattern):
 @pytest.mark.django_db
 async def test_cache_refreshed_on_upstream_change():
     """Should refresh cache when an upstream is updated"""
-    # Create Upstream and URIPattern
     upstream = await sync_to_async(Upstream.objects.create)(
         name="Test Upstream",
         base_url="http://old-url.com"
@@ -79,14 +78,20 @@ async def test_cache_refreshed_on_upstream_change():
         is_active=True
     )
 
-    # Populate cache
     patterns = await get_uri_patterns()
     assert patterns[0].upstream_base_url == "http://old-url.com/"
 
-    # Update Upstream
     upstream.base_url = "http://new-url.com"
     await sync_to_async(upstream.save)()
 
-    # Verify cache is updated
     patterns = await get_uri_patterns()
     assert patterns[0].upstream_base_url == "http://new-url.com/"
+
+
+@pytest.mark.asyncio
+async def test_create_http_session_uses_env_proxy_settings():
+    session = create_http_session()
+    try:
+        assert session.trust_env is True
+    finally:
+        await session.close()

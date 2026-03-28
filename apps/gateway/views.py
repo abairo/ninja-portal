@@ -1,13 +1,9 @@
-from aiohttp import ClientSession
 from django.http import HttpResponse, JsonResponse
 from ninja import Router
-from django.conf import settings
-from .services import (
-    introspect,
-    match_route,
-    get_backend_url
-)
+
+from .infrastructure.http_client import create_http_session
 from .routing_state import get_uri_patterns
+from .services import get_backend_url, introspect, match_route
 from .token_utils import extract_token
 
 
@@ -59,20 +55,20 @@ async def proxy_request(request, path: str):
 
     if route.upstream_app_token:
         prefix = route.upstream_token_prefix or "Bearer "
-        headers['Authorization'] = f"{prefix} {route.upstream_app_token}"
+        headers["Authorization"] = f"{prefix} {route.upstream_app_token}"
 
     data = None
 
     if method in ("POST", "PUT", "PATCH"):
         data = request.body
 
-    async with ClientSession() as session:
+    async with create_http_session() as session:
         async with session.request(
             method=method,
             url=backend_url,
             headers=headers,
             params=request.GET,
-            data=data
+            data=data,
         ) as resp:
             content = await resp.read()
             return HttpResponse(
