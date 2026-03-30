@@ -6,7 +6,6 @@ from .routing_state import get_uri_patterns
 from .services import get_backend_url, introspect, match_route
 from .token_utils import extract_token
 
-
 router = Router()
 
 
@@ -32,15 +31,11 @@ async def proxy_request(request, path: str):
     route = match_route(f"/{path}", method, await get_uri_patterns())
 
     if not route:
-        return JsonResponse(
-            {"error": "Path or method not allowed"}, status=403
-        )
+        return JsonResponse({"error": "Path or method not allowed"}, status=403)
     if route.requires_auth:
         auth = request.headers.get("Authorization")
         if not auth or not auth.startswith("Bearer "):
-            return JsonResponse(
-                {"error": "Missing or invalid token"}, status=401
-            )
+            return JsonResponse({"error": "Missing or invalid token"}, status=401)
         access_token = extract_token(auth)
         introspected_data = await introspect(access_token)
         if not introspected_data.get("active"):
@@ -49,7 +44,8 @@ async def proxy_request(request, path: str):
     backend_url = get_backend_url(path, route)
 
     headers = {
-        k: v for k, v in request.headers.items()
+        k: v
+        for k, v in request.headers.items()
         if k.lower() not in {"host", "content-length", "connection", "authorization"}
     }
 

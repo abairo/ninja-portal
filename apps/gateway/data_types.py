@@ -1,10 +1,15 @@
-from parse import compile, Parser
+from parse import Parser, compile
 
 
 class URIPatternData:
     __slots__ = (
-        'pattern', 'methods', 'requires_auth', 'target_path', 
-        'upstream_base_url', 'upstream_app_token', 'upstream_token_prefix'
+        "pattern",
+        "methods",
+        "requires_auth",
+        "target_path",
+        "upstream_base_url",
+        "upstream_app_token",
+        "upstream_token_prefix",
     )
 
     def __init__(
@@ -15,7 +20,7 @@ class URIPatternData:
         target_path: str = "",
         upstream_base_url: str = "",
         upstream_app_token: str = "",
-        upstream_token_prefix: str = ""
+        upstream_token_prefix: str = "",
     ):
         self.pattern: Parser = compile(pattern)
         self.methods: set[str] = set(methods)

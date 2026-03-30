@@ -29,7 +29,9 @@ async def introspect(access_token: str) -> dict:
             return await response.json()
 
 
-def match_route(path: str, method: str, routes: tuple[URIPatternData]) -> URIPatternData | None:
+def match_route(
+    path: str, method: str, routes: tuple[URIPatternData]
+) -> URIPatternData | None:
     """
     Matches a request path and method against a list of active URI patterns.
 
