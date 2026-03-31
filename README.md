@@ -50,6 +50,12 @@ Copy the example environment file and configure it:
 cp env.example .env
 ```
 
+For local Docker development, copy the override template and adjust it as needed for your machine:
+
+```bash
+cp docker-compose.override.example.yml docker-compose.override.yml
+```
+
 **Key Environment Variables:**
 
 | Variable | Description | Example |
@@ -57,16 +63,24 @@ cp env.example .env
 | `DEBUG` | Enable debug mode | `True` or `False` |
 | `SECRET_KEY` | Django secret key | `django-insecure-...` |
 | `ALLOWED_HOSTS` | Comma-separated allowed hosts | `localhost,127.0.0.1` |
+| `DATABASE_URL` | Database connection URL | `sqlite:///db.sqlite3` |
 | `KEYCLOAK_INTROSPECT_URL` | OAuth2 Token Introspection URL | `http://auth-server/realms/master/protocol/openid-connect/token/introspect` |
 | `KEYCLOAK_CLIENT_ID` | Client ID for introspection | `api-gateway` |
 | `KEYCLOAK_CLIENT_SECRET` | Client Secret for introspection | `secret-value` |
 
 ### 3. Database Setup
 
-Run migrations to set up the SQLite database (and create `URIPattern` table):
+Run migrations to set up the database (SQLite by default, or PostgreSQL if `DATABASE_URL` points to it):
 
 ```bash
 poetry run python manage.py migrate
+```
+
+Examples:
+
+```env
+DATABASE_URL=sqlite:///db.sqlite3
+DATABASE_URL=postgresql://user:password@localhost:5432/ninja_portal
 ```
 
 ### 4. Running the Development Server
@@ -87,6 +101,12 @@ You can run the entire stack (Gateway + Memcached) using Docker Compose:
 
 ```bash
 docker-compose up -d --build
+```
+
+For local development, Docker Compose will automatically load `docker-compose.override.yml` when present. Start from the versioned template:
+
+```bash
+cp docker-compose.override.example.yml docker-compose.override.yml
 ```
 
 -   **API Gateway**: `http://localhost:8009` (Mapped port)
