@@ -14,24 +14,28 @@ ROUTES = [
         "methods": ("GET",),
         "requires_auth": True,
         "target_path": "",
+        "is_active": True,
     },
     {
         "pattern": "/api/v1/my-example/{id}/example_2",
         "methods": ("GET",),
         "requires_auth": True,
         "target_path": "",
+        "is_active": True,
     },
     {
         "pattern": "/api/v1/my-example/{id}/example_3",
         "methods": ("GET",),
         "requires_auth": True,
         "target_path": "",
+        "is_active": True,
     },
     {
         "pattern": "/api/v1/my-example/{id}/example4",
         "methods": ("GET",),
         "requires_auth": True,
         "target_path": "",
+        "is_active": True,
     },
 ]
 
@@ -84,11 +88,10 @@ def test_extract_token(test_input, expected_output):
 
 
 @pytest.mark.django_db
-def test_get_uri_patterns(uri_patterns: URIPattern):
-    assert get_uri_patterns()
+async def test_get_uri_patterns(uri_patterns: URIPattern):
+    assert await get_uri_patterns()
 
 
-@pytest.mark.asyncio
 @pytest.mark.django_db
 async def test_cache_refreshed_on_upstream_change():
     """Should refresh cache when an upstream is updated"""
@@ -100,16 +103,15 @@ async def test_cache_refreshed_on_upstream_change():
     )
 
     patterns = await get_uri_patterns()
-    assert patterns[0].upstream_base_url == "http://old-url.com/"
+    assert patterns[0].upstream_base_url == "http://old-url.com"
 
     upstream.base_url = "http://new-url.com"
     await sync_to_async(upstream.save)()
 
     patterns = await get_uri_patterns()
-    assert patterns[0].upstream_base_url == "http://new-url.com/"
+    assert patterns[0].upstream_base_url == "http://new-url.com"
 
 
-@pytest.mark.asyncio
 async def test_create_http_session_uses_env_proxy_settings():
     session = create_http_session()
     try:
