@@ -18,6 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from ninja import NinjaAPI
+
 from apps.gateway.views import router as proxy_router
 
 api = NinjaAPI()

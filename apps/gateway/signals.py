@@ -1,6 +1,7 @@
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
-from .models import URIPattern, Upstream
+
+from .models import Upstream, URIPattern
 from .routing_state import update_uri_patterns_cache
 
 

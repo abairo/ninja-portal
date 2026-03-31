@@ -17,8 +17,7 @@ application = get_asgi_application()
 
 
 # TODO evaluate this configuration, maybe we should remove this and configure nginx to serve these static files
-from django.conf import settings
-from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
-
+from django.conf import settings  # noqa: E402
+from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler  # noqa: E402
 
 application = ASGIStaticFilesHandler(application)
